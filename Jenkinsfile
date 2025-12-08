@@ -34,19 +34,22 @@ pipeline {
         }
 
         stage('Deploy to EC2') {
-    steps {
-        sshagent(credentials: [SSH_CREDENTIALS]) {
-            bat '''
-                ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} "
+            steps {
+                sshCommand remote: [
+                    name: 'EC2-Server',
+                    host: "${EC2_HOST}",
+                    user: "${EC2_USER}",
+                    identityFile: "${SSH_CREDENTIALS}",
+                    allowAnyHosts: true
+                ], command: '''
                     set -e
-
                     sudo apt-get update -y
                     sudo apt-get install -y docker.io git
 
                     mkdir -p /home/ubuntu/app
                     cd /home/ubuntu/app
 
-                    if [ -d \\"RevCart-P1/.git\\" ]; then
+                    if [ -d "RevCart-P1/.git" ]; then
                         cd RevCart-P1
                         git pull origin main
                     else
@@ -55,29 +58,26 @@ pipeline {
                         cd RevCart-P1
                     fi
 
+                    # Backend Container
                     cd backend
                     sudo docker build -t backend-app .
                     sudo docker stop backend-app || true
                     sudo docker rm backend-app || true
                     sudo docker run -d -p 8080:8080 --name backend-app \
-                      -e DB_HOST=${DB_HOST} \
-                      -e DB_NAME=${DB_NAME} \
-                      -e DB_USER=${DB_USER} \
-                      -e DB_PASSWORD=${DB_PASSWORD} \
-                      backend-app
+                        -e DB_HOST=${DB_HOST} \
+                        -e DB_NAME=${DB_NAME} \
+                        -e DB_USER=${DB_USER} \
+                        -e DB_PASSWORD=${DB_PASSWORD} \
+                        backend-app
 
+                    # Frontend Container
                     cd ../frontend
                     sudo docker build -t frontend-app .
                     sudo docker stop frontend-app || true
                     sudo docker rm frontend-app || true
                     sudo docker run -d -p 80:80 --name frontend-app frontend-app
-                "
-            '''
+                '''
+            }
         }
-    }
-}
-
-
-       
     }
 }
