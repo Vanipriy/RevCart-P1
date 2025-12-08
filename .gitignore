@@ -1,0 +1,29 @@
+# Backend
+backend/target/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+*.jar
+*.war
+*.class
+
+# Frontend
+revcart-frontend/node_modules/
+revcart-frontend/dist/
+revcart-frontend/.angular/
+revcart-frontend/-p/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment
+.env
