@@ -5,10 +5,12 @@ pipeline {
         GIT_BRANCH = "main"
         GIT_URL    = "https://github.com/Vanipriy/RevCart-P1.git"
 
-        EC2_HOST = "ubuntu@16.112.70.145"
+        EC2_HOST = "16.112.70.145"
+        EC2_USER = "ubuntu"
+        SSH_CREDENTIALS = "ec2-ssh-key"
 
         DB_HOST     = "revcart-db.cvs2i6k829o9.ap-south-2.rds.amazonaws.com"
-        DB_NAME     = "revcartdb"  // ❗ remove hyphen in DB name
+        DB_NAME     = "revcartdb"
         DB_USER     = "admin"
         DB_PASSWORD = "Vanipriya"
     }
@@ -31,45 +33,51 @@ pipeline {
             }
         }
 
-        stage('Copy Backend & Frontend to EC2') {
+        stage('Deploy to EC2') {
             steps {
-                sshagent(['ec2-ssh-key']) {
-                    bat '''
-                    ssh -o StrictHostKeyChecking=no %EC2_HOST% "mkdir -p /home/ubuntu/app"
-                    
-                    scp -o StrictHostKeyChecking=no -r backend %EC2_HOST%:/home/ubuntu/app/
-                    scp -o StrictHostKeyChecking=no -r frontend %EC2_HOST%:/home/ubuntu/app/
-                    '''
-                }
-            }
-        }
+                sshCommand remote: [
+                    host: EC2_HOST,
+                    user: EC2_USER,
+                    credentialsId: SSH_CREDENTIALS,
+                    port: 22,
+                    allowAnyHosts: true
+                ], command: """
+                    set -e
 
-        stage('Deploy Backend & Frontend on EC2') {
-            steps {
-                sshagent(['ec2-ssh-key']) {
-                    bat '''
-                    ssh -o StrictHostKeyChecking=no %EC2_HOST% "
-                        cd /home/ubuntu/app/backend &&
-                        docker build -t backend-app . &&
-                        docker stop backend-app || true &&
-                        docker rm backend-app || true &&
-                        docker run -d -p 8080:8080 --name backend-app \
-                          -e DB_HOST=%DB_HOST% \
-                          -e DB_NAME=%DB_NAME% \
-                          -e DB_USER=%DB_USER% \
-                          -e DB_PASSWORD=%DB_PASSWORD% \
-                          backend-app
-                    "
+                    sudo apt-get update -y
+                    sudo apt-get install -y docker.io git
 
-                    ssh -o StrictHostKeyChecking=no %EC2_HOST% "
-                        cd /home/ubuntu/app/frontend &&
-                        docker build -t frontend-app . &&
-                        docker stop frontend-app || true &&
-                        docker rm frontend-app || true &&
-                        docker run -d -p 80:80 --name frontend-app frontend-app
-                    "
-                    '''
-                }
+                    mkdir -p /home/ubuntu/app
+                    cd /home/ubuntu/app
+
+                    if [ -d "RevCart-P1/.git" ]; then
+                        cd RevCart-P1
+                        git pull origin main
+                    else
+                        rm -rf RevCart-P1
+                        git clone ${GIT_URL}
+                        cd RevCart-P1
+                    fi
+
+                    # Backend Docker
+                    cd backend
+                    sudo docker build -t backend-app .
+                    sudo docker stop backend-app || true
+                    sudo docker rm backend-app || true
+                    sudo docker run -d -p 8080:8080 --name backend-app \
+                        -e DB_HOST=${DB_HOST} \
+                        -e DB_NAME=${DB_NAME} \
+                        -e DB_USER=${DB_USER} \
+                        -e DB_PASSWORD=${DB_PASSWORD} \
+                        backend-app
+
+                    # Frontend Docker
+                    cd ../frontend
+                    sudo docker build -t frontend-app .
+                    sudo docker stop frontend-app || true
+                    sudo docker rm frontend-app || true
+                    sudo docker run -d -p 80:80 --name frontend-app frontend-app
+                """
             }
         }
     }
