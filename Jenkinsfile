@@ -28,14 +28,13 @@ pipeline {
             }
         }
 
-        stage('Deploy to EC2') {
+                stage('Deploy to EC2') {
             steps {
                 sshCommand remote: [
                     name: 'EC2-Server',
                     host: '16.112.70.145',
                     user: 'ubuntu',
-                    identityFile: 'C:/Users/Vani Priya/Downloads/revkey.pem',
-                    knownHosts: 'allowAnyHosts'
+                    credentialsId: 'ec2-ssh-key'
                 ], command: '''
                     set -e
                     sudo apt-get update -y
@@ -72,5 +71,6 @@ pipeline {
                 '''
             }
         }
+
     }
 }
