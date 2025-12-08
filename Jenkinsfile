@@ -22,17 +22,18 @@ pipeline {
         }
 
         stage('Build Backend JAR') {
-            steps {
-                dir('backend') {
-                    sh 'mvn clean package -DskipTests'
-                }
-            }
+    steps {
+        dir('backend') {
+            bat 'mvn clean package -DskipTests'
         }
+    }
+}
+
 
         stage('Copy Files to EC2') {
             steps {
                 sshagent(['ec2-ssh-key']) {
-                    sh '''
+                    bat '''
                       ssh -o StrictHostKeyChecking=no ${EC2_HOST} "mkdir -p /home/ubuntu/app && rm -rf /home/ubuntu/app/*"
 
                       scp -o StrictHostKeyChecking=no -r backend ${EC2_HOST}:/home/ubuntu/app/
@@ -45,7 +46,7 @@ pipeline {
         stage('Build & Run Containers on EC2') {
             steps {
                 sshagent(['ec2-ssh-key']) {
-                    sh '''
+                    bat '''
                       ssh -o StrictHostKeyChecking=no ${EC2_HOST} "
                         cd /home/ubuntu/app/backend &&
                         docker build -t backend-app . &&
