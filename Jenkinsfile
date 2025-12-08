@@ -21,13 +21,16 @@ pipeline {
             }
         }
 
-        stage('Build Backend JAR') {
+       stage('Build Backend JAR') {
     steps {
         dir('backend') {
-            bat 'mvn clean package -DskipTests'
+            withMaven(maven: 'M3') {
+                bat 'mvn clean package -DskipTests'
+            }
         }
     }
 }
+
 
     }
 }
