@@ -2,24 +2,31 @@ pipeline {
     agent any
 
     environment {
-        GIT_BRANCH = "main"
-        GIT_URL    = "https://github.com/Vanipriy/RevCart-P1.git"
-
-        EC2_HOST = "16.112.70.145"
-        EC2_USER = "ubuntu"
-        SSH_CREDENTIALS = "ec2-ssh-key"
-
-        DB_HOST     = "revcart-db.cvs2i6k829o9.ap-south-2.rds.amazonaws.com"
-        DB_NAME     = "revcartdb"
-        DB_USER     = "admin"
-        DB_PASSWORD = "Vanipriya"
+        DB_HOST = 'revcart-db.cvs2i6k829o9.ap-south-2.rds.amazonaws.com'
+        DB_NAME = 'revcartdb'
+        DB_USER = 'admin'
+        DB_PASSWORD = 'Vanipriya'
     }
+
+    // SSH Remote config for EC2
+    // 👇 Be sure this path is correct!
+    // Use forward slashes even on Windows
+    }
+    def remote = [
+        name: 'EC2-Server',
+        host: '16.112.70.145',
+        user: 'ubuntu',
+        identityFile: 'C:/Users/Vani Priya/Downloads/revkey.pem',
+        knownHosts: 'allowAnyHosts'
+    ]
 
     stages {
 
         stage('Checkout') {
             steps {
-                git branch: "${GIT_BRANCH}", url: "${GIT_URL}"
+                git branch: 'main',
+                    url: 'https://github.com/Vanipriy/RevCart-P1.git',
+                    credentialsId: 'github-credentials'
             }
         }
 
@@ -27,56 +34,49 @@ pipeline {
             steps {
                 dir('backend') {
                     withMaven(maven: 'M3') {
-                        bat 'mvn clean package -DskipTests'
+                        bat "mvn clean package -DskipTests"
                     }
                 }
             }
         }
 
-       stage('Deploy to EC2') {
-    steps {
-        sshCommand remote: [
-            name: 'EC2-Server',
-            host: "${EC2_HOST}",
-            user: "${EC2_USER}",
-            identity: "${SSH_CREDENTIALS}",
-            allowAnyHosts: true
-        ], command: '''
-            set -e
-            sudo apt-get update -y
-            sudo apt-get install -y docker.io git
+        stage('Deploy to EC2') {
+            steps {
+                sshCommand remote: remote, command: '''
+                    set -e
+                    sudo apt-get update -y
+                    sudo apt-get install -y docker.io git
 
-            mkdir -p /home/ubuntu/app
-            cd /home/ubuntu/app
+                    mkdir -p /home/ubuntu/app
+                    cd /home/ubuntu/app
 
-            if [ -d "RevCart-P1/.git" ]; then
-                cd RevCart-P1
-                git pull origin main
-            else
-                rm -rf RevCart-P1
-                git clone https://github.com/Vanipriy/RevCart-P1.git
-                cd RevCart-P1
-            fi
+                    if [ -d "RevCart-P1/.git" ]; then
+                        cd RevCart-P1
+                        git pull origin main
+                    else
+                        rm -rf RevCart-P1
+                        git clone https://github.com/Vanipriy/RevCart-P1.git
+                        cd RevCart-P1
+                    fi
 
-            cd backend
-            sudo docker build -t backend-app .
-            sudo docker stop backend-app || true
-            sudo docker rm backend-app || true
-            sudo docker run -d -p 8080:8080 --name backend-app \
-                -e DB_HOST=${DB_HOST} \
-                -e DB_NAME=${DB_NAME} \
-                -e DB_USER=${DB_USER} \
-                -e DB_PASSWORD=${DB_PASSWORD} \
-                backend-app
+                    cd backend
+                    sudo docker build -t backend-app .
+                    sudo docker stop backend-app || true
+                    sudo docker rm backend-app || true
+                    sudo docker run -d -p 8080:8080 --name backend-app \
+                        -e DB_HOST=$DB_HOST \
+                        -e DB_NAME=$DB_NAME \
+                        -e DB_USER=$DB_USER \
+                        -e DB_PASSWORD=$DB_PASSWORD \
+                        backend-app
 
-            cd ../frontend
-            sudo docker build -t frontend-app .
-            sudo docker stop frontend-app || true
-            sudo docker rm frontend-app || true
-            sudo docker run -d -p 80:80 --name frontend-app frontend-app
-        '''
-    }
-}
-
+                    cd ../frontend
+                    sudo docker build -t frontend-app .
+                    sudo docker stop frontend-app || true
+                    sudo docker rm frontend-app || true
+                    sudo docker run -d -p 80:80 --name frontend-app frontend-app
+                '''
+            }
+        }
     }
 }
