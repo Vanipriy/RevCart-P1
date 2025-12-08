@@ -8,18 +8,6 @@ pipeline {
         DB_PASSWORD = 'Vanipriya'
     }
 
-    // SSH Remote config for EC2
-    // 👇 Be sure this path is correct!
-    // Use forward slashes even on Windows
-    }
-    def remote = [
-        name: 'EC2-Server',
-        host: '16.112.70.145',
-        user: 'ubuntu',
-        identityFile: 'C:/Users/Vani Priya/Downloads/revkey.pem',
-        knownHosts: 'allowAnyHosts'
-    ]
-
     stages {
 
         stage('Checkout') {
@@ -42,7 +30,13 @@ pipeline {
 
         stage('Deploy to EC2') {
             steps {
-                sshCommand remote: remote, command: '''
+                sshCommand remote: [
+                    name: 'EC2-Server',
+                    host: '16.112.70.145',
+                    user: 'ubuntu',
+                    identityFile: 'C:/Users/Vani Priya/Downloads/revkey.pem',
+                    knownHosts: 'allowAnyHosts'
+                ], command: '''
                     set -e
                     sudo apt-get update -y
                     sudo apt-get install -y docker.io git
