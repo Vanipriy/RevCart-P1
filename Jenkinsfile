@@ -36,12 +36,14 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 sshCommand remote: [
-                    host: EC2_HOST,
-                    user: EC2_USER,
-                    credentialsId: SSH_CREDENTIALS,
-                    port: 22,
-                    allowAnyHosts: true
-                ], command: """
+    name: "EC2-Server",
+    host: EC2_HOST,
+    user: EC2_USER,
+    credentialsId: SSH_CREDENTIALS,
+    port: 22,
+    allowAnyHosts: true
+], command: """
+
                     set -e
 
                     sudo apt-get update -y
