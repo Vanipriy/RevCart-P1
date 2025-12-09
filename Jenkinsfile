@@ -27,6 +27,16 @@ pipeline {
                 }
             }
         }
+        stage("Test SSH") {
+    sshCommand remote: [
+        name: 'EC2-Server',
+        host: '16.112.70.145',
+        user: 'ubuntu',
+        credentialsId: 'ec2-ssh-key',
+        allowAnyHosts: true
+    ], command: "echo 'SSH Success from Jenkins'"
+}
+
 
                 stage('Deploy to EC2') {
     steps {
