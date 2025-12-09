@@ -9,8 +9,8 @@ declare var StompJs: any;
   providedIn: 'root'
 })
 export class NotificationService {
-  private apiUrl = 'http://localhost:8080/api/notifications';
-  private wsUrl = 'http://localhost:8080/ws';
+  private apiUrl = 'http://98.130.47.246:8080/api/notifications';
+  private wsUrl = 'http://98.130.47.246:8080/ws';
   private stompClient: any;
   private notificationsSubject = new BehaviorSubject<any[]>([]);
   public notifications$ = this.notificationsSubject.asObservable();
