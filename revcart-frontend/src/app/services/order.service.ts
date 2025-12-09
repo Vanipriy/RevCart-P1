@@ -58,6 +58,6 @@ export class OrderService {
   }
 
   getRecentOrders(): Observable<RecentOrder[]> {
-    return this.http.get<RecentOrder[]>(`${this.apiUrl}/admin/orders/recent`);
+        return this.http.get<RecentOrder[]>(`${environment.apiUrl}/admin/orders/recent`);
   }
 }
