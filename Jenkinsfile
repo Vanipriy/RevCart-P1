@@ -31,12 +31,14 @@ pipeline {
                 stage('Deploy to EC2') {
     steps {
         sshCommand remote: [
-            name: 'EC2-Server',
-            host: '16.112.70.145',
-            port: 22,
-            user: 'ubuntu',
-            credentialsId: 'ec2-ssh-key'
-        ], command: '''
+    name: 'EC2-Server',
+    host: '16.112.70.145',
+    port: 22,
+    user: 'ubuntu',
+    credentialsId: 'ec2-ssh-key',
+    allowAnyHosts: true
+], command: '''
+
             set -e
             sudo apt-get update -y
             sudo apt-get install -y docker.io git
