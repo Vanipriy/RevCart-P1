@@ -31,13 +31,12 @@ pipeline {
                 stage('Deploy to EC2') {
     steps {
         sshCommand remote: [
-    name: "EC2-Server",
-    host: "16.112.70.145",
-    user: "ubuntu",
-    credentialsId: "ec2-ssh-key",
-    port: 22
-], command: """
-
+            name: 'EC2-Server',
+            host: '16.112.70.145',
+            port: 22,
+            user: 'ubuntu',
+            credentialsId: 'ec2-ssh-key'
+        ], command: '''
             set -e
             sudo apt-get update -y
             sudo apt-get install -y docker.io git
@@ -59,11 +58,7 @@ pipeline {
             sudo docker stop backend-app || true
             sudo docker rm backend-app || true
             sudo docker run -d -p 8080:8080 --name backend-app \
-                -e DB_HOST=$DB_HOST \
-                -e DB_NAME=$DB_NAME \
-                -e DB_USER=$DB_USER \
-                -e DB_PASSWORD=$DB_PASSWORD \
-                backend-app
+            -e DB_HOST=$DB_HOST -e DB_NAME=$DB_NAME -e DB_USER=$DB_USER -e DB_PASSWORD=$DB_PASSWORD backend-app
 
             cd ../frontend
             sudo docker build -t frontend-app .
@@ -73,6 +68,7 @@ pipeline {
         '''
     }
 }
+
 
 
     }
