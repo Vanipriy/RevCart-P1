@@ -81,27 +81,10 @@ pipeline {
 
         stage('Deploy to EC2') {
             steps {
-                script {
-                    withCredentials([
-                        string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
-                        string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY'),
-                        string(credentialsId: 'db-password', variable: 'RDS_PASSWORD'),
-                        string(credentialsId: 'google-client-secret', variable: 'GOOGLE_CLIENT_SECRET'),
-                        sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')
-                    ]) {
-                        bat """
-                            ssh -o StrictHostKeyChecking=no -i %SSH_KEY% %EC2_USER%@%EC2_HOST% ^
-                            "export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} && ^
-                            export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} && ^
-                            export RDS_ENDPOINT=${RDS_ENDPOINT} && ^
-                            export RDS_USERNAME=${RDS_USERNAME} && ^
-                            export RDS_PASSWORD=${RDS_PASSWORD} && ^
-                            export GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} && ^
-                            export GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} && ^
-                            /home/ubuntu/deploy.sh"
-                        """
-                    }
-                }
+                echo 'Images pushed to ECR successfully!'
+                echo 'Backend: 744640651616.dkr.ecr.ap-south-2.amazonaws.com/rev-backend:latest'
+                echo 'Frontend: 744640651616.dkr.ecr.ap-south-2.amazonaws.com/rev-frontend:latest'
+                echo 'SSH to EC2 and run: /home/ubuntu/deploy.sh'
             }
         }
     }
