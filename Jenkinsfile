@@ -25,7 +25,7 @@ pipeline {
         stage('Build Backend JAR') {
             steps {
                 withCredentials([
-                    string(credentialsId: 'rds-password', variable: 'RDS_PASSWORD'),
+                    string(credentialsId: 'db-password', variable: 'RDS_PASSWORD'),
                     string(credentialsId: 'google-client-secret', variable: 'GOOGLE_CLIENT_SECRET')
                 ]) {
                     dir('backend') {
@@ -84,7 +84,7 @@ pipeline {
                 withCredentials([
                     string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
                     string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY'),
-                    string(credentialsId: 'rds-password', variable: 'RDS_PASSWORD'),
+                    string(credentialsId: 'db-password', variable: 'RDS_PASSWORD'),
                     string(credentialsId: 'google-client-secret', variable: 'GOOGLE_CLIENT_SECRET')
                 ]) {
                     sshCommand remote: [
