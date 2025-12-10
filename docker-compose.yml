@@ -27,8 +27,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      FRONTEND_URL: http://localhost:3000
-      CORS_ORIGINS: "*"
+      FRONTEND_URL: http://16.112.117.45:3000
+      CORS_ORIGINS: http://16.112.117.45:3000,http://16.112.117.45:8080
+      OAUTH_REDIRECT_URI: http://16.112.117.45:8080/api/login/oauth2/code/google
     ports:
       - "8080:8080"
     networks:
