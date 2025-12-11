@@ -82,8 +82,8 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 echo 'Images pushed to ECR successfully!'
-                echo 'Backend: 744640651616.dkr.ecr.ap-south-2.amazonaws.com/rev-backend:latest'
-                echo 'Frontend: 744640651616.dkr.ecr.ap-south-2.amazonaws.com/rev-frontend:latest'
+                echo 'Backend: 744640651616.dkr.ecr.ap-south-2.amazonaws.com/revcart-backend:latest'
+                echo 'Frontend: 744640651616.dkr.ecr.ap-south-2.amazonaws.com/revcart-frontend:latest'
                 echo 'SSH to EC2 and run: /home/ubuntu/deploy.sh'
             }
         }
