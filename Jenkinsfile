@@ -6,7 +6,7 @@ pipeline {
         ECR_REGISTRY = '744640651616.dkr.ecr.ap-south-2.amazonaws.com'
         BACKEND_REPO = 'rev-backend'
         FRONTEND_REPO = 'rev-frontend'
-        EC2_HOST = '98.130.47.246'
+        EC2_HOST = '16.112.42.233'
         EC2_USER = 'ubuntu'
         RDS_ENDPOINT = 'revcart-db.cvs2i6k829o9.ap-south-2.rds.amazonaws.com'
         RDS_USERNAME = 'admin'
