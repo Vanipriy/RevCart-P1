@@ -1,16 +1,16 @@
 pipeline {
     agent any
-
-    environment {
-        AWS_REGION = 'ap-south-2'
-        ECR_REGISTRY = '744640651616.dkr.ecr.ap-south-2.amazonaws.com'
-        BACKEND_REPO = 'rev-backend'
-        FRONTEND_REPO = 'rev-frontend'
-        EC2_HOST = '16.112.42.233'
-        EC2_USER = 'ubuntu'
-        RDS_ENDPOINT = 'revcart-db.cvs2i6k829o9.ap-south-2.rds.amazonaws.com'
-        RDS_USERNAME = 'admin'
-        GOOGLE_CLIENT_ID = '366076975270-k4d44ag99mpp9irv7jqgqqdiicfo35fe.apps.googleusercontent.com'
+    
+    environment { 
+        AWS_REGION = 'ap-south-2' 
+        ECR_REGISTRY = '744640651616.dkr.ecr.ap-south-2.amazonaws.com' 
+        BACKEND_REPO = 'revcart-backend' 
+        FRONTEND_REPO = 'revcart-frontend' 
+        EC2_HOST = '40.192.87.17'
+        EC2_USER = 'ubuntu' 
+        RDS_ENDPOINT = 'revcart-db.cvs2i6k829o9.ap-south-2.rds.amazonaws.com' 
+        RDS_USERNAME = 'admin' 
+        GOOGLE_CLIENT_ID = '366076975270-k4d44ag99mpp9irv7jqgqqdiicfo35fe.apps.googleusercontent.com' 
     }
 
     stages {
